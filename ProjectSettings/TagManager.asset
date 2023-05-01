@@ -13,6 +13,7 @@ TagManager:
   - Enemy
   - Mob
   - EnemyBullet
+  - Obstacle
   layers:
   - Default
   - TransparentFX

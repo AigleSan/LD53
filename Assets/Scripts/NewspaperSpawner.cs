@@ -33,9 +33,9 @@ public class NewspaperSpawner : MonoBehaviour
         newspaperSpawnCooldown = Time.time;
         GameObject newNewspaper = Instantiate(newspaper);
         newNewspaper.transform.position = new Vector3(
-            Random.Range(0f, 80f),
-            (2f),
-            Random.Range(0f, 40f)
+            Random.Range(40f, 220f),
+            (2.6f),
+            Random.Range(25f, 230f)
         );
     }
 }

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class PlayerDelivery : MonoBehaviour
 {
@@ -37,6 +38,11 @@ public class PlayerDelivery : MonoBehaviour
         deliveryCooldown -= Time.deltaTime;
         gameManager = GameObject.Find("GameManager");
         gameManagerScript = gameManager.GetComponent<GameManager>();
+
+        if(deliveryPoints == 0){
+
+            SceneManager.LoadScene(2);
+        }
     }
 
     void OnTriggerEnter(Collider other)
@@ -52,19 +58,30 @@ public class PlayerDelivery : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        if (
-            Input.GetKey(KeyCode.R)
-            && (other.gameObject.tag == "DeliveryPoint")
-            && (newspaperCount > 0)
-            && (deliveryCooldown <= 0)
-        )
+        if (newspaperCount > 0)
         {
-            newspaperCount--;
-            deliveryPoints--;
-            deliveryCooldown = deliveryStartCooldown;
-            Debug.Log("Journal Livré ! Il en reste " + newspaperCount);
-            Debug.Log("Il reste encore " + deliveryPoints + " à livrer !");
-            Destroy(other.gameObject);
+            if (
+                Input.GetKey(KeyCode.LeftShift)
+                || Input.GetKey(KeyCode.RightShift)
+                    && (other.gameObject.tag == "DeliveryPoint")
+                    && (deliveryCooldown <= 0)
+            )
+            {
+                newspaperCount--;
+                deliveryPoints--;
+                deliveryCooldown = deliveryStartCooldown;
+                Debug.Log("Journal Livré ! Il en reste " + newspaperCount);
+                Debug.Log("Il reste encore " + deliveryPoints + " à livrer !");
+                Destroy(other.gameObject);
+            }
+        }
+    }
+
+    private void OnCollisionEnter(Collision other)
+    {
+        if (other.gameObject.tag == "Mob")
+        {
+            SceneManager.LoadScene("GameOver");
         }
     }
 }
