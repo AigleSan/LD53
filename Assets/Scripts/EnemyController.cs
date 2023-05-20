@@ -60,11 +60,11 @@ public class EnemyController : MonoBehaviour
            // {
                 transform.LookAt(player);
                 //supposons que ce soit le script d'un ennemi au corps à corps
-                transform.position = Vector3.MoveTowards(
-                    transform.position,
-                    player.position,
-                    moveSpeed * Time.deltaTime
-                );
+                // transform.position = Vector3.MoveTowards(
+                //     transform.position,
+                //     player.position,
+                //     moveSpeed * Time.deltaTime
+                // );
             //}
         }
         else if (Vector3.Distance(transform.position, player.position) <= shootRange)
@@ -124,10 +124,10 @@ public class EnemyController : MonoBehaviour
     }
 
     private void OnCollsionEnter(Collision other) {
-        if (other.gameObject.tag == ("Player")){
-                SceneManager.LoadScene("GameOver");
-                Debug.Log(other.gameObject.name + " touché !");
-        }
+        // if (other.gameObject.tag == ("Player")){
+        //         SceneManager.LoadScene("GameOver");
+        //         Debug.Log(other.gameObject.name + " touché !");
+        // }
 
         if (other.gameObject.tag == ("Obstacle")){
             Physics.IgnoreCollision(other.collider, this.gameObject.GetComponent<Collider>());

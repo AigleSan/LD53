@@ -3,88 +3,58 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
-{
-    private bool canJump;
+{[SerializeField]
+    private Rigidbody rb;
+    [SerializeField] private float movementSpeed;
+    //[SerializeField] private Animator anim;
 
-    [SerializeField]
-    private float moveSpeed;
+    private bool isMoving;
 
-    [SerializeField]
-    //private float jumpForce;
 
-    public Rigidbody rb;
-    public Animator anim;
-    public SpriteRenderer graphics;
+    Vector3 forward, right;
+    public Vector3 heading;
 
-    // Start is called before the first frame update
-    void Start()
+
+    private void Start()
     {
         rb = GetComponent<Rigidbody>();
-        anim = GetComponentInChildren<Animator>();
-        graphics = GetComponent<SpriteRenderer>();
+        forward = Camera.main.transform.forward;
+        forward.y = 0;
+        forward = Vector3.Normalize(forward);
+        right = Quaternion.Euler(new Vector3(0, 90, 0)) * forward;
+        //anim = GetComponentInChildren(typeof(Animator)) as Animator;
+
     }
 
-    // Update is called once per frame
-    void Update()
+    private void FixedUpdate()
     {
-        var movementX = Input.GetAxisRaw("Horizontal");
-        var movementZ = Input.GetAxisRaw("Vertical");
-        transform.position +=
-            new Vector3(movementX, 0f, movementZ).normalized * moveSpeed * Time.deltaTime;
-
-        Vector3 direction = new Vector3(movementX, 0f, movementZ).normalized;
-
-        if (direction.magnitude >= 0.1f)
+        if (Input.GetKey(KeyCode.Z) || Input.GetKey(KeyCode.Q) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D))
         {
-            float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
-            transform.rotation = Quaternion.Euler(0f, targetAngle, 0f);
+
+            Move();
+            isMoving = true;
+
+        }
+        else
+        {
+            isMoving = false;
         }
 
-        // if (canJump == true && Input.GetKeyDown(KeyCode.Space))
-        // {
-        //     rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-        //
-        // }
-        if (movementZ >= 0.1f)
-        {
-            anim.Play("backWalk");
-        }
-        else if (movementZ <= -0.1f)
-        {
-            anim.Play("frontWalk");
-        }
-
-        else if (movementX >= 0.1f && movementZ == 0)
-        {
-            anim.Play("sideWalk");
-        }
-
-        else if (movementX <= -0.1f && movementZ == 0)
-        {
-            anim.Play("sideWalkLeft");
-            //graphics.flipY;
-        }
-
-        else{
-            anim.Play("idle");
-        }
     }
 
-    void OnTriggerEnter(Collider other)
+
+    void Move()
     {
-        if (other.gameObject.tag == "Ground")
-        {
-            canJump = true;
-            Debug.Log("on ground");
-        }
+
+        Vector3 direction = new Vector3(Input.GetAxis("HorizontalKey"), 0, Input.GetAxis("VerticalKey"));
+        Vector3 rightMovement = right * movementSpeed * Time.deltaTime * Input.GetAxis("HorizontalKey");
+        Vector3 upMovement = forward * movementSpeed * Time.deltaTime * Input.GetAxis("VerticalKey");
+
+        heading = Vector3.Normalize(rightMovement + upMovement);
+        Vector3 movement = Vector3.Normalize(heading) * movementSpeed * Time.deltaTime;
+        //transform.forward = heading;
+        transform.position += movement;
+
     }
 
-    void OnTriggerExit(Collider other)
-    {
-        if (other.gameObject.tag == "Ground")
-        {
-            canJump = false;
-            Debug.Log("on ground");
-        }
-    }
 }

@@ -39,8 +39,8 @@ public class PlayerDelivery : MonoBehaviour
         gameManager = GameObject.Find("GameManager");
         gameManagerScript = gameManager.GetComponent<GameManager>();
 
-        if(deliveryPoints == 0){
-
+        if (deliveryPoints == 0)
+        {
             SceneManager.LoadScene(2);
         }
     }
@@ -61,10 +61,9 @@ public class PlayerDelivery : MonoBehaviour
         if (newspaperCount > 0)
         {
             if (
-                Input.GetKey(KeyCode.LeftShift)
-                || Input.GetKey(KeyCode.RightShift)
-                    && (other.gameObject.tag == "DeliveryPoint")
-                    && (deliveryCooldown <= 0)
+                Input.GetKey(KeyCode.Space)
+                && (other.gameObject.tag == "DeliveryPoint")
+                && (deliveryCooldown <= 0)
             )
             {
                 newspaperCount--;

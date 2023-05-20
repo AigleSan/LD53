@@ -11,7 +11,7 @@ public class EnemyBullet : MonoBehaviour
     [SerializeField] private float lifespan;
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -27,11 +27,11 @@ public class EnemyBullet : MonoBehaviour
         }
     }
 
-    // private void OnCollisionEnter(Collision other) {
-    //     if(other.gameObject.tag == "Enemy"){
-    //         Physics.IgnoreCollision(other.collider, this.gameObject.GetComponent<SphCollider>());
-    //     }
-    // }
+    private void OnCollisionEnter(Collision other) {
+        if(other.gameObject.tag == "Enemy"){
+            Physics.IgnoreCollision(other.collider, this.gameObject.GetComponent<Collider>());
+        }
+    }
 
     
 }

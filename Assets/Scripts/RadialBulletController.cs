@@ -9,9 +9,17 @@ public class RadialBulletController : MonoBehaviour
     public int numberOfProjectiles;
     public float projectileSpeed;
 
+    public Vector3 rotationAngle;
+
     private float projectileSpawnRate;
 
     public float projectileSpawnStartRate;
+
+    private float shootCooldown;
+
+    public float startShootCooldown;
+
+    //public float rotationSpeed;
     public GameObject ProjectilePrefab;
 
     private Vector3 startPoint;
@@ -21,14 +29,16 @@ public class RadialBulletController : MonoBehaviour
     void Start()
     {
         projectileSpawnRate = projectileSpawnStartRate;
+        shootCooldown = 0;
     }
 
     // Update is called once per frame
     void Update()
     {
+        shootCooldown -= Time.deltaTime;
         projectileSpawnRate -= Time.deltaTime;
 
-        if (projectileSpawnRate <= 0 )
+        if (projectileSpawnRate <= 0 && shootCooldown <= 0)
         {
             startPoint = transform.position;
             SpawnProjectile(numberOfProjectiles);
@@ -62,7 +72,10 @@ public class RadialBulletController : MonoBehaviour
                 0,
                 projectileMoveDirection.y
             );
+
             angle += angleStep;
+
+            //tmpObj.GetComponent<Transform>().RotateAround(this.gameObject.transform.position, rotationAngle, rotationSpeed * Time.deltaTime);
         }
     }
 }

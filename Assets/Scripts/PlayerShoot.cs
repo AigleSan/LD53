@@ -19,7 +19,7 @@ public class PlayerShoot : MonoBehaviour
     void Update()
     {
         shootCooldown -= Time.deltaTime;
-        if (Input.GetKeyDown(KeyCode.E) && shootCooldown <= 0)
+        if (Input.GetMouseButton(0) && shootCooldown <= 0)
         {
             GameObject bullet = Instantiate(bulletPrefab, shootPoint.position, Quaternion.identity);
             //bullet.transform.position += transform.forward * speed * Time.deltaTime;
