@@ -20,8 +20,7 @@ public class WeaponHandler : MonoBehaviour
     private float timeSinceLastSwitch;
 
     private Sprite weaponIcon;
-    private string weaponAmmo,
-        weaponMagSize;
+    private string weaponAmmo;
 
     WeaponInfoUI weaponInfoUI;
 
@@ -90,8 +89,8 @@ public class WeaponHandler : MonoBehaviour
 
         weaponIcon = GetComponentInChildren<Gun>().getWeaponIcon();
         weaponAmmo = GetComponentInChildren<Gun>().getCurrentAmmo().ToString();
-        weaponMagSize = GetComponentInChildren<Gun>().getMagSize().ToString();
-        weaponInfoUI.SetWeaponInfo(weaponIcon, weaponAmmo, weaponMagSize);
+       // weaponMagSize = GetComponentInChildren<Gun>().getMagSize().ToString();
+        weaponInfoUI.SetWeaponInfo(weaponIcon, weaponAmmo);
 
         timeSinceLastSwitch = 0f;
         Debug.Log("Changement d'arme");

@@ -1,79 +1,149 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class EnemyMovement : MonoBehaviour
 {
-    // Start is called before the first frame update
+    public NavMeshAgent agent;
+    public Transform player;
+    public LayerMask whatIsGround,
+        whatIsPlayer;
 
-    public Transform[] waypoints;
-    private Transform target;
-    private Transform player;
+    Collider collider;
 
-    public float moveSpeed,
-        attackRange,
-        sightRange;
+    //Patroling
+    public Vector3 walkPoint;
+    bool walkPointSet;
+    public float walkPointRange;
 
-    private int destPoint;
+    //Attacking
 
-    Vector3 lastPosition;
+    public float timeBetweenAttacks,
+        shootForce,
+        rushSpeed,
+        afterRushWaitTime;
 
-    private float cooldown = 0f;
-    public float startCooldown = 3f;
+        public int rushDamage;
 
-    void Awake()
+    bool alreadyAttacked,
+        isRushing;
+
+    public GameObject projectile;
+
+    //States
+    public float sightRange,
+        attackRange;
+
+    public bool playerInSightRange,
+        playerInAttackRange;
+
+    private void Awake()
     {
-        target = waypoints[0];
-        lastPosition = transform.position;
         player = GameObject.Find("Player").transform;
-        //target = player;
+        agent = GetComponent<NavMeshAgent>();
+        collider = GetComponent<Collider>();
     }
 
-    // Update is called once per frame
-    void FixedUpdate()
+    private void Update()
     {
-        Vector3 dir = target.position - transform.position;
+        playerInSightRange = Physics.CheckSphere(transform.position, sightRange, whatIsPlayer);
+        playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, whatIsPlayer);
 
-        if (
-            Vector3.Distance(transform.position, player.position) < sightRange
-            && Vector3.Distance(transform.position, player.position) >= attackRange
-        )
+        if (!playerInSightRange && !playerInAttackRange)
+            Patroling();
+        if (playerInSightRange && !playerInAttackRange)
+            ChasePlayer();
+        if (playerInAttackRange && playerInSightRange)
+           ShootPlayer(player.position);
+
+        Vector3 distanceToWalkPoint = transform.position - walkPoint;
+        if (distanceToWalkPoint.magnitude <= 0.1f)
+            walkPointSet = false;
+    }
+
+    private void Patroling()
+    {
+        if (!walkPointSet)
+            SearchWalkPoint();
+
+        if (walkPointSet)
+            Debug.Log("Patroling");
+        agent.SetDestination(walkPoint);
+    }
+
+    private void ChasePlayer()
+    {
+        agent.SetDestination(player.position);
+
+        transform.LookAt(player);
+    }
+
+    private void ShootPlayer(Vector3 targetPos)
+    {
+        agent.SetDestination(transform.position);
+        transform.LookAt(targetPos);
+
+        if (!alreadyAttacked)
         {
-            //            supposons que ce soit le script d'un ennemi au corps à corps
-           MoveTowardTarget(player);
-        }
-        else if (Vector3.Distance(transform.position, player.position) <= attackRange)
-        {
-            if (cooldown <= 0)
-            {
-                //Attack();
-                Debug.Log(gameObject.name + "Vient d'attaquer !");
-                cooldown = startCooldown;
-            }
-            else
-            {
-                cooldown -= Time.deltaTime;
-            }
-        }
-        else
-        {
-            MoveTowardTarget(target);
-            if (Vector3.Distance(transform.position, target.position) < 0.3f) //on verifie si la distance entre l'ennemi et sa cible est inferieure  à 3
-            {
-                destPoint = (destPoint + 1) % waypoints.Length; //l'operateur % permet de recuperer le reste d'une division
-                target = waypoints[destPoint];
-            }
+            Rigidbody rb = Instantiate(projectile, transform.position, Quaternion.identity)
+                .GetComponent<Rigidbody>();
+            rb.AddForce(transform.forward * shootForce, ForceMode.Impulse);
+            alreadyAttacked = true;
+            Invoke(nameof(ResetAttack), timeBetweenAttacks);
         }
     }
 
-    public void MoveTowardTarget(Transform target)
+    IEnumerator RushPlayer(Vector3 targetPos)
     {
+        //transform.position = targetPos;
+        collider.isTrigger = true;
+        isRushing = true;
         transform.position = Vector3.MoveTowards(
             transform.position,
-            target.position,
-            moveSpeed * Time.deltaTime
+            targetPos,
+            rushSpeed * Time.deltaTime
+        );
+        yield return new WaitForSeconds(afterRushWaitTime);
+        collider.isTrigger = false;
+        isRushing = false;
+    }
+
+    private void SearchWalkPoint()
+    {
+        float randomZ = Random.Range(-walkPointRange, walkPointRange);
+        float randomX = Random.Range(-walkPointRange, walkPointRange);
+
+        walkPoint = new Vector3(
+            transform.position.x + randomX,
+            transform.position.y,
+            transform.position.z + randomZ
         );
 
-        transform.LookAt(target);
+        if (Physics.Raycast(walkPoint, -transform.up, 2f, whatIsGround))
+            walkPointSet = true;
+    }
+
+    private void ResetAttack()
+    {
+        alreadyAttacked = false;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(transform.position, attackRange);
+            Gizmos.color = Color.blue;
+            Gizmos.DrawWireSphere(transform.position, sightRange);
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "Player") { 
+            other.gameObject.GetComponent<PlayerHealth>().TakeDamage(rushDamage);
+
+        }
     }
 }

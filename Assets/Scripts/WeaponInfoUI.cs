@@ -9,7 +9,7 @@ public class WeaponInfoUI : MonoBehaviour
     // Start is called before the first frame update
 
     public Image weaponIcon;
-    public TMP_Text currentAmmo, magSize;
+    public TMP_Text currentAmmo;
 
     //public Gun gun;
 
@@ -26,12 +26,12 @@ public class WeaponInfoUI : MonoBehaviour
         
     }
 
-    public void SetWeaponInfo(Sprite icon, string currentAmmo, string magSize){
+    public void SetWeaponInfo(Sprite icon, string currentAmmo){
         //gun = GameObject.Find("Player").GetComponentInChildren<Gun>(true);
         
         this.weaponIcon.sprite = icon;
         this.currentAmmo.text = currentAmmo;
-        this.magSize.text = magSize;
+        //this.magSize.text = magSize;
 
 
     }

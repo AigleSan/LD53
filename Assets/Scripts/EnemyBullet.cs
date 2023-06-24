@@ -9,9 +9,11 @@ public class EnemyBullet : MonoBehaviour
     [SerializeField] private int damage;
 
     [SerializeField] private float lifespan;
+
+    PlayerHealth playerHealth;
     void Start()
     {
-
+        playerHealth = GameObject.Find("Player").GetComponent<PlayerHealth>();
     }
 
     // Update is called once per frame
@@ -24,7 +26,11 @@ public class EnemyBullet : MonoBehaviour
         if(other.gameObject.tag == "Player"){
 
             //Infliger des dégats
+            playerHealth.TakeDamage(damage);
+            Debug.Log("Le joueur a reçu" + damage + "dégats");
+            Destroy(this.gameObject);
         }
+
     }
 
     private void OnCollisionEnter(Collision other) {
